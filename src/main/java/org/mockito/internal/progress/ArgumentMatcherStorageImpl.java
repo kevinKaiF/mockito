@@ -64,6 +64,7 @@ public class ArgumentMatcherStorageImpl implements ArgumentMatcherStorage {
     }
 
     public void validateState() {
+        // 如果已经有参数匹配器入栈了，说明mockito尚未初始化完毕，已经开始mock测试，需要抛出异常
         if (!matcherStack.isEmpty()) {
             List<LocalizedMatcher> lastMatchers = resetStack();
             throw misplacedArgumentMatcher(lastMatchers);

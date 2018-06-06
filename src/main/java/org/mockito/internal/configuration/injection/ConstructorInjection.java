@@ -42,16 +42,20 @@ public class ConstructorInjection extends MockInjectionStrategy {
 
     public boolean processInjection(Field field, Object fieldOwner, Set<Object> mockCandidates) {
         try {
+            // 将mock或spy过的对象，保存到SimpleArgumentResolver，按class解析获取对应的mock或者spy对象
             SimpleArgumentResolver simpleArgumentResolver = new SimpleArgumentResolver(mockCandidates);
+            // 有参构造注入
             FieldInitializationReport report = new FieldInitializer(fieldOwner, field, simpleArgumentResolver).initialize();
-
+            // 是否使用有参构造方法初始化
             return report.fieldWasInitializedUsingContructorArgs();
         } catch (MockitoException e) {
+            // 如果是反射调用异常就直接throw，否则捕获返回false
             if(e.getCause() instanceof InvocationTargetException) {
                 Throwable realCause = e.getCause().getCause();
                 throw fieldInitialisationThrewException(field, realCause);
             }
             // other causes should be fine
+            // 其他原因都是ok的，所以这里不做过多处理，只是返回false，表示有参构造注入失败而已，可以使用其他方式注入
             return false;
         }
 
@@ -75,6 +79,7 @@ public class ConstructorInjection extends MockInjectionStrategy {
             return argumentInstances.toArray();
         }
 
+        // 查找已经mock或者spy过的对象
         private Object objectThatIsAssignableFrom(Class<?> argType) {
             for (Object object : objects) {
                 if(argType.isAssignableFrom(object.getClass())) return object;

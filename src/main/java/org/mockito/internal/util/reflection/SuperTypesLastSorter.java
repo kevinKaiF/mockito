@@ -28,10 +28,12 @@ public class SuperTypesLastSorter {
     public static List<Field> sortSuperTypesLast(Collection<? extends Field> unsortedFields) {
         List<Field> fields = new ArrayList<Field>(unsortedFields);
 
+        // 按属性类型升序排序
         Collections.sort(fields, compareFieldsByName);
 
         int i = 0;
 
+        // 将顶级属性放在最前面
         while (i < fields.size() - 1) {
             Field f = fields.get(i);
             Class<?> ft = f.getType();

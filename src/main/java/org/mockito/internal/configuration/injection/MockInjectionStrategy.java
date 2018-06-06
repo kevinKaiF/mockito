@@ -65,6 +65,8 @@ public abstract class MockInjectionStrategy {
      * @return <code>true</code> if successful, <code>false</code> otherwise.
      */
     public boolean process(Field onField, Object fieldOwnedBy, Set<Object> mockCandidates) {
+        // 如果当前注入策略失败，则使用nextStrategy
+        // 比如说，如果使用构造方法注入失败，可以使用属性注入
         if(processInjection(onField, fieldOwnedBy, mockCandidates)) {
             return true;
         }

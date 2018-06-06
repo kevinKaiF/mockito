@@ -43,6 +43,7 @@ import static org.mockito.internal.util.StringUtil.join;
  * <p>This engine will fail, if the field is also annotated with incompatible Mockito annotations.
  */
 @SuppressWarnings({"unchecked"})
+// spy注解的对象注入
 public class SpyAnnotationEngine implements AnnotationEngine, org.mockito.configuration.AnnotationEngine {
 
     @Override
@@ -83,10 +84,12 @@ public class SpyAnnotationEngine implements AnnotationEngine, org.mockito.config
         MockSettings settings = withSettings().defaultAnswer(CALLS_REAL_METHODS)
                                               .name(field.getName());
         Class<?> type = field.getType();
+        // 如果是接口
         if (type.isInterface()) {
             return Mockito.mock(type, settings.useConstructor());
         }
         int modifiers = type.getModifiers();
+        // 私有抽象的内部类
         if (typeIsPrivateAbstractInnerClass(type, modifiers)) {
             throw new MockitoException(join("@Spy annotation can't initialize private abstract inner classes.",
                                             "  inner class: '" + type.getSimpleName() + "'",
@@ -94,6 +97,8 @@ public class SpyAnnotationEngine implements AnnotationEngine, org.mockito.config
                                             "",
                                             "You should augment the visibility of this inner class"));
         }
+
+        // 非静态的内部类
         if (typeIsNonStaticInnerClass(type, modifiers)) {
             Class<?> enclosing = type.getEnclosingClass();
             if (!enclosing.isInstance(testInstance)) {
@@ -102,6 +107,8 @@ public class SpyAnnotationEngine implements AnnotationEngine, org.mockito.config
                                                 "  outer class: '" + enclosing.getSimpleName() + "'",
                                                 ""));
             }
+
+            // spy注解的时候，需要以enclosingClass作为构造参数？ TODO
             return Mockito.mock(type, settings.useConstructor()
                                               .outerInstance(testInstance));
         }

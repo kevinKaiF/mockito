@@ -18,6 +18,7 @@ import static org.mockito.internal.exceptions.Reporter.moreThanOneAnnotationNotA
 import static org.mockito.internal.util.reflection.FieldSetter.setField;
 
 /**
+ * 初始化@Mock和@Captor注解的属性
  * Initializes fields annotated with &#64;{@link org.mockito.Mock} or &#64;{@link org.mockito.Captor}.
  *
  * <p>

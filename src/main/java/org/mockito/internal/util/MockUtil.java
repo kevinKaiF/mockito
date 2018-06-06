@@ -32,10 +32,12 @@ public class MockUtil {
     public static <T> T createMock(MockCreationSettings<T> settings) {
         MockHandler mockHandler =  createMockHandler(settings);
 
+        // 生成mock
         T mock = mockMaker.createMock(settings, mockHandler);
-
+        // spy注解属性所对应的真正的属性对象
         Object spiedInstance = settings.getSpiedInstance();
         if (spiedInstance != null) {
+            // 将spy注解所对应的真正的属性对象的所有field
             new LenientCopyTool().copyToMock(spiedInstance, mock);
         }
 
@@ -50,6 +52,7 @@ public class MockUtil {
         mockMaker.resetMock(mock, newHandler, settings);
     }
 
+    // 参数mock应该是个mock对象
     public static <T> MockHandler<T> getMockHandler(T mock) {
         if (mock == null) {
             throw new NotAMockException("Argument should be a mock, but is null!");
@@ -67,6 +70,7 @@ public class MockUtil {
     }
 
     public static boolean isSpy(Object mock) {
+        // spy与mock的区别就是spy会返回real_method
         return isMock(mock) && getMockSettings(mock).getDefaultAnswer() == Mockito.CALLS_REAL_METHODS;
     }
 

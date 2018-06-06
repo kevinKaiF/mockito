@@ -159,6 +159,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * @see MockitoJUnitRunner
  * @since 1.8.3
  */
+// InjectMocks所注解的对象只能注入@Mock,@Spy所注解的对象
 @Documented
 @Target(FIELD)
 @Retention(RUNTIME)

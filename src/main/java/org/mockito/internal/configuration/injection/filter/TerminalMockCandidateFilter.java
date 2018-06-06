@@ -26,12 +26,14 @@ public class TerminalMockCandidateFilter implements MockCandidateFilter {
                                            final Field candidateFieldToBeInjected,
                                            final List<Field> allRemainingCandidateFields,
                                            final Object injectee) {
+        // 过滤到最后一层，此时的mock应当有且只有一个！
         if(mocks.size() == 1) {
             final Object matchingMock = mocks.iterator().next();
 
             return new OngoingInjector() {
                 public Object thenInject() {
                     try {
+                        // 调用set方法注入，如果失败，则直接反射field注入
                         if (!new BeanPropertySetter(injectee, candidateFieldToBeInjected).set(matchingMock)) {
                             setField(injectee, candidateFieldToBeInjected,matchingMock);
                         }

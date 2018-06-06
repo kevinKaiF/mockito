@@ -44,6 +44,7 @@ public class InjectingAnnotationEngine implements AnnotationEngine, org.mockito.
 
     private void processInjectMocks(final Class<?> clazz, final Object testInstance) {
         Class<?> classContext = clazz;
+        // 遍历class的父级注入mock
         while (classContext != Object.class) {
             injectMocks(testInstance);
             classContext = classContext.getSuperclass();
@@ -78,9 +79,13 @@ public class InjectingAnnotationEngine implements AnnotationEngine, org.mockito.
         Set<Object> mocks = newMockSafeHashSet();
 
         while (clazz != Object.class) {
+            // 扫描依@InjectMocks注解的属性，添加到mockDependentFields
             new InjectMocksScanner(clazz).addTo(mockDependentFields);
+            // 扫描mock或者spy对象，添加到mocks中
             new MockScanner(testClassInstance, clazz).addPreparedMocks(mocks);
+            // 自定义注入的钩子
             onInjection(testClassInstance, clazz, mockDependentFields, mocks);
+            // 递归遍历父级
             clazz = clazz.getSuperclass();
         }
 

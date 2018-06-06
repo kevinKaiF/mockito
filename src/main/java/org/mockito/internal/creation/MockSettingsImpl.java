@@ -149,6 +149,7 @@ public class MockSettingsImpl<T> extends CreationSettings<T> implements MockSett
 
     @Override
     public Object[] getConstructorArgs() {
+        // 如果outClassInstance不为空，则需要将outerClassInstance作为构造方法的第一个参数
         if (outerClassInstance == null) {
             return constructorArgs;
         }

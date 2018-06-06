@@ -25,6 +25,7 @@ import static org.mockito.internal.util.reflection.FieldSetter.setField;
  * So if the field is still null, then nothing will happen there.
  * </p>
  */
+// 注入spy注解的属性
 public class SpyOnInjectedFieldsHandler extends MockInjectionStrategy {
 
     @Override
@@ -35,6 +36,7 @@ public class SpyOnInjectedFieldsHandler extends MockInjectionStrategy {
         if(!fieldReader.isNull() && field.isAnnotationPresent(Spy.class)) {
             try {
                 Object instance = fieldReader.read();
+                // 如果这个对象已经是mock了，需要重置
                 if (MockUtil.isMock(instance)) {
                     // A. instance has been spied earlier
                     // B. protect against multiple use of MockitoAnnotations.initMocks()
@@ -43,7 +45,7 @@ public class SpyOnInjectedFieldsHandler extends MockInjectionStrategy {
                     Object mock = Mockito.mock(instance.getClass(), withSettings()
 					    .spiedInstance(instance)
 					    .defaultAnswer(Mockito.CALLS_REAL_METHODS)
-					    .name(field.getName()));
+					    .name(field.getName()));  // mock名称为field名称
 					setField(fieldOwner, field, mock);
                 }
             } catch (Exception e) {

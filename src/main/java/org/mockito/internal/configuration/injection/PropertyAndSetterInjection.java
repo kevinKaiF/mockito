@@ -76,12 +76,14 @@ public class PropertyAndSetterInjection extends MockInjectionStrategy {
 
 
     public boolean processInjection(Field injectMocksField, Object injectMocksFieldOwner, Set<Object> mockCandidates) {
+        // 直接无参构造注入属性
         FieldInitializationReport report = initializeInjectMocksField(injectMocksField, injectMocksFieldOwner);
 
         // for each field in the class hierarchy
         boolean injectionOccurred = false;
         Class<?> fieldClass = report.fieldClass();
         Object fieldInstanceNeedingInjection = report.fieldInstance();
+        // 遍历属性父级注入
         while (fieldClass != Object.class) {
             injectionOccurred |= injectMockCandidates(fieldClass, fieldInstanceNeedingInjection, newMockSafeHashSet(mockCandidates));
             fieldClass = fieldClass.getSuperclass();
@@ -102,12 +104,20 @@ public class PropertyAndSetterInjection extends MockInjectionStrategy {
     }
 
 
+    /**
+     * 属性注入
+     *
+     * @param awaitingInjectionClazz    注入的class
+     * @param injectee                  被注入的属性的实体
+     * @param mocks                     所有的mocks
+     * @return
+     */
     private boolean injectMockCandidates(Class<?> awaitingInjectionClazz, Object injectee, Set<Object> mocks) {
         boolean injectionOccurred;
         List<Field> orderedCandidateInjecteeFields = orderedInstanceFieldsFrom(awaitingInjectionClazz);
         // pass 1
         injectionOccurred = injectMockCandidatesOnFields(mocks, injectee, false, orderedCandidateInjecteeFields);
-        // pass 2
+        // pass 2  TODO 为什么注入两次？
         injectionOccurred |= injectMockCandidatesOnFields(mocks, injectee, injectionOccurred, orderedCandidateInjecteeFields);
         return injectionOccurred;
     }
@@ -118,11 +128,14 @@ public class PropertyAndSetterInjection extends MockInjectionStrategy {
                                                  List<Field> orderedCandidateInjecteeFields) {
         for (Iterator<Field> it = orderedCandidateInjecteeFields.iterator(); it.hasNext(); ) {
             Field candidateField = it.next();
+            // 返回被注入的mock
             Object injected = mockCandidateFilter.filterCandidate(mocks, candidateField, orderedCandidateInjecteeFields, injectee)
                                                  .thenInject();
             if (injected != null) {
                 injectionOccurred |= true;
+                // 移除注入成功的mock
                 mocks.remove(injected);
+                // 移除注入的field
                 it.remove();
             }
         }

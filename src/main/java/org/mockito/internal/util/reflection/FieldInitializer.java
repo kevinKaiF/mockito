@@ -226,6 +226,7 @@ public class FieldInitializer {
         private final Object testClass;
         private final Field field;
         private final ConstructorArgumentResolver argResolver;
+        // 按构造参数多少降序
         private final Comparator<Constructor<?>> byParameterNumber = new Comparator<Constructor<?>>() {
             public int compare(Constructor<?> constructorA, Constructor<?> constructorB) {
                 int argLengths = constructorB.getParameterTypes().length - constructorA.getParameterTypes().length;
@@ -237,6 +238,7 @@ public class FieldInitializer {
                 return argLengths;
             }
 
+            // 如果A,B的构造参数一样多，就比较那个构造参数的mock实例多
             private int countMockableParams(Constructor<?> constructor) {
                 int constructorMockableParamsSize = 0;
                 for (Class<?> aClass : constructor.getParameterTypes()) {
@@ -262,11 +264,15 @@ public class FieldInitializer {
             final AccessibilityChanger changer = new AccessibilityChanger();
             Constructor<?> constructor = null;
             try {
+                // 获取属性的构造方法
                 constructor = biggestConstructor(field.getType());
                 changer.enableAccess(constructor);
 
+                // 解析属性的构造参数，获取对应的mock或者spy对象
                 final Object[] args = argResolver.resolveTypeInstances(constructor.getParameterTypes());
+                // 由mock或者spy对象生成属性实例
                 Object newFieldInstance = constructor.newInstance(args);
+                // 将属性实例注入到testClass实体中
                 setField(testClass, field,newFieldInstance);
 
                 return new FieldInitializationReport(field.get(testClass), false, true);

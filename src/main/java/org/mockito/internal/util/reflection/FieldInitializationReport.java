@@ -9,8 +9,11 @@ package org.mockito.internal.util.reflection;
  * Report on field initialization
  */
 public class FieldInitializationReport {
+    // 属性实体
     private final Object fieldInstance;
+    // 是否使用无参构造方法初始化
     private final boolean wasInitialized;
+    // 是否是构造参数方式初始化
     private final boolean wasInitializedUsingConstructorArgs;
 
     public FieldInitializationReport(Object fieldInstance, boolean wasInitialized, boolean wasInitializedUsingConstructorArgs) {

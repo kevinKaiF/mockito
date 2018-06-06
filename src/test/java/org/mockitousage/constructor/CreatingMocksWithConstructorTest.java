@@ -235,10 +235,13 @@ public class CreatingMocksWithConstructorTest extends TestBase {
     public void mocking_inner_classes_with_wrong_outer_instance() {
         try {
             //when
-            mock(InnerClass.class, withSettings().useConstructor().outerInstance(123).defaultAnswer(CALLS_REAL_METHODS));
+            // 内部类生成mock的时候，需要将outerInstance注入
+            InnerClass mock = mock(InnerClass.class, withSettings().useConstructor().outerInstance(this/*123*/).defaultAnswer(CALLS_REAL_METHODS));
+            System.out.println("print：" + mock.getMessage());
             //then
-            fail();
+//            fail();
         } catch (MockitoException e) {
+//            e.printStackTrace();
             assertThat(e).hasMessage("Unable to create mock instance of type 'InnerClass'");
             //TODO it would be nice if all useful information was in the top level exception, instead of in the exception's cause
             //also applies to other scenarios in this test

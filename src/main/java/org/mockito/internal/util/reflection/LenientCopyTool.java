@@ -8,6 +8,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 @SuppressWarnings("unchecked")
+// LenientCopyTool所有的方法都是无状态的，为什么不把方法设置成静态的？而是每次使用的时候去new一个？
 public class LenientCopyTool {
 
     FieldCopier fieldCopier = new FieldCopier();

@@ -144,6 +144,12 @@ public class MockingProgressImpl implements MockingProgress {
         return argumentMatcherStorage;
     }
 
+    /**
+     * 发布mock创建事件的通知
+     *
+     * @param mock      创建的mock对象
+     * @param settings  该mock所对应的setting
+     */
     public void mockingStarted(Object mock, MockCreationSettings settings) {
         for (MockitoListener listener : listeners) {
             if (listener instanceof MockCreationListener) {

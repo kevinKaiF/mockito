@@ -29,8 +29,10 @@ public class MockitoAssertionError extends AssertionError {
     public MockitoAssertionError(String message) {
         super(message);
 
+        // 保留原始的栈信息
         unfilteredStackTrace = getStackTrace();
 
+        // 过滤栈信息，重新set到Throwable
         ConditionalStackTraceFilter filter = new ConditionalStackTraceFilter();
         filter.filter(this);
     }

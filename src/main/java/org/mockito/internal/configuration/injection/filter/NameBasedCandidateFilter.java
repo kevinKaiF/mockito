@@ -4,13 +4,22 @@
  */
 package org.mockito.internal.configuration.injection.filter;
 
+import org.mockito.internal.util.MockUtil;
+
 import static org.mockito.internal.util.MockUtil.getMockName;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
+/**
+ * 基于mock名称的过滤
+ * 注意：在生成mock名称之前，MockScanner的addPreparedMocks方法中{@link MockUtil#maybeRedefineMockName(Object, String)}
+ * 重新注入新的mock名称，且为field的名称
+ * @see org.mockito.internal.configuration.injection.scanner.MockScanner#addPreparedMocks(Set)
+ */
 public class NameBasedCandidateFilter implements MockCandidateFilter {
     private final MockCandidateFilter next;
 
@@ -22,6 +31,8 @@ public class NameBasedCandidateFilter implements MockCandidateFilter {
                                            final Field candidateFieldToBeInjected,
                                            final List<Field> allRemainingCandidateFields,
                                            final Object injectee) {
+        // 如果mock只有一个，且是另一个field，就不需要再注入了
+        // 同一个类中有两个属性是同一个类型，这种情况就不需要再注入了
         if (mocks.size() == 1
                 && anotherCandidateMatchesMockName(mocks, candidateFieldToBeInjected, allRemainingCandidateFields)) {
             return OngoingInjector.nop;
@@ -37,9 +48,17 @@ public class NameBasedCandidateFilter implements MockCandidateFilter {
         return mocks.size() > 1;
     }
 
+    /**
+     * 筛选field的名称和mock名称一致的mock对象
+     *
+     * @param mocks
+     * @param candidateFieldToBeInjected
+     * @return
+     */
     private List<Object> selectMatchingName(Collection<Object> mocks, Field candidateFieldToBeInjected) {
         List<Object> mockNameMatches = new ArrayList<Object>();
         for (Object mock : mocks) {
+            // 获取属性名称与mock equals的
             if (candidateFieldToBeInjected.getName().equals(getMockName(mock).toString())) {
                 mockNameMatches.add(mock);
             }
@@ -64,7 +83,7 @@ public class NameBasedCandidateFilter implements MockCandidateFilter {
         for (Field otherCandidateField : allRemainingCandidateFields) {
             if (!otherCandidateField.equals(candidateFieldToBeInjected)
                     && otherCandidateField.getType().equals(candidateFieldToBeInjected.getType())
-                    && otherCandidateField.getName().equals(mockName)) {
+                    && otherCandidateField.getName().equals(mockName)) { // field的name equals mockName
                 return true;
             }
         }

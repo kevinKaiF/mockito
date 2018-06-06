@@ -57,6 +57,7 @@ public class MockScanner {
             FieldReader fieldReader = new FieldReader(instance, field);
 
             Object mockInstance = preparedMock(fieldReader.read(), field);
+            // 如果是mock或者spy过的对象
             if (mockInstance != null) {
                 mocks.add(mockInstance);
             }
@@ -65,9 +66,12 @@ public class MockScanner {
     }
 
     private Object preparedMock(Object instance, Field field) {
+        // 如果属性已经被@Mock或者@Spy注解，直接返回属性对应的值
         if (isAnnotatedByMockOrSpy(field)) {
             return instance;
         }
+
+        // 如果是mock或者spy对象，则将mockName更新为field的name
         if (isMockOrSpy(instance)) {
             MockUtil.maybeRedefineMockName(instance, field.getName());
             return instance;

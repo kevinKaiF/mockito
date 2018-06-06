@@ -18,6 +18,7 @@ import java.util.Set;
 /**
  * Scan field for injection.
  */
+// 属性扫描器
 public class InjectMocksScanner {
     private final Class<?> clazz;
 
@@ -51,6 +52,7 @@ public class InjectMocksScanner {
         Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
             if (null != field.getAnnotation(InjectMocks.class)) {
+                // 被InjectMocks注解的对象，不能被Mock,Captor重复注解
                 assertNoAnnotations(field, Mock.class, Captor.class);
                 mockDependentFields.add(field);
             }
